@@ -5,7 +5,8 @@ class ChatReception extends StatelessWidget {
   final String image;
   final Function onListenClick;
 
-  const ChatReception({Key key, this.text, this.image, this.onListenClick})
+  const ChatReception(
+      {Key key, @required this.text, @required this.image, this.onListenClick})
       : super(key: key); // TODO : put this to required
 
   @override
@@ -20,7 +21,7 @@ class ChatReception extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.07,
             height: MediaQuery.of(context).size.width * 0.07,
             child: CircleAvatar(
-              backgroundImage: AssetImage('assets/khmer_flag.png'),
+              backgroundImage: AssetImage(image),
             ),
           ),
           SizedBox(
@@ -35,9 +36,9 @@ class ChatReception extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5)),
+                        topRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10)),
                     color: Color(0xff917ADC),
                     boxShadow: [
                       BoxShadow(
@@ -48,7 +49,7 @@ class ChatReception extends StatelessWidget {
                     ]),
                 padding: EdgeInsets.all(10),
                 child: Text(
-                  'Hellkejrglkjdkfgjlkfglkjo\n\n\nwerewrew',
+                  text,
                   style: TextStyle(color: Colors.white),
                 ),
               ),

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ChatMe extends StatelessWidget {
+  final String text;
+  final String image;
+  final Function onListenClick;
+
+  const ChatMe({Key key,@required this.text,@required this.image, this.onListenClick})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -15,9 +22,9 @@ class ChatMe extends StatelessWidget {
             ),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    bottomLeft: Radius.circular(5),
-                    bottomRight: Radius.circular(5)),
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10)),
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
@@ -27,8 +34,7 @@ class ChatMe extends StatelessWidget {
                       offset: Offset(0, 3))
                 ]),
             padding: EdgeInsets.all(10),
-            child: Text(
-                'Hellkejrglkjdkfgjlkfd jlgkj dflkjg lkfdj glkjfd lkgjfdl ksjflkgjslfdkgjldskfjgkjfdsglkjo\n\n\nwerewrew'),
+            child: Text(text),
           ),
           SizedBox(
             width: 5,
@@ -37,7 +43,7 @@ class ChatMe extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.07,
             height: MediaQuery.of(context).size.width * 0.07,
             child: CircleAvatar(
-              backgroundImage: AssetImage('assets/khmer_flag.png'),
+              backgroundImage: AssetImage(image),
             ),
           )
         ],
