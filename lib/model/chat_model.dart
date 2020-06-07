@@ -13,7 +13,7 @@ class ChatModel {
       @required this.soundUrl});
 
   static List<ChatModel> getChats(int total) {
-    bool isMe = false;
+    bool isMe = true;
     List<ChatModel> chats = [];
     for (int i = 0; i < total; i++) {
       isMe = !isMe;
