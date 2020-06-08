@@ -25,6 +25,9 @@ dependencies:
     sdk: flutter
   flutter_svg: ^0.17.4
   flutter_bloc: ^4.0.0
+  flutter_realm: ^0.2.2
+
+  translator: ^0.1.4
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -51,6 +54,8 @@ flutter:
     - khmer_flag.png
     - send_icon.svg
     - khmer_flag_round.png
+    - japan_english.png
+    - english_japan.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

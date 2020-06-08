@@ -5,9 +5,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:translateapp/bloc/chat_loader/ChatLoaderBloc.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
+import 'package:translateapp/bloc/chat_request/chat_request_bloc.dart';
+import 'package:translateapp/bloc/chat_request/chat_request_event.dart';
 import 'package:translateapp/model/chat_model.dart';
 import 'package:translateapp/widget/chat_me.dart';
 import 'package:translateapp/widget/chat_reception.dart';
+
+import 'bloc/chat_request/chat_request_state.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -17,6 +21,9 @@ class ChatScreen extends StatefulWidget {
 // 0xffF7F7F7
 class _ChatScreenState extends State<ChatScreen> {
   ChatLoaderBloc _chatLoaderBloc = ChatLoaderBloc();
+  ChatRequestBloc _chatRequestBloc = ChatRequestBloc();
+
+  TextEditingController _messageEditingTextCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -30,6 +37,9 @@ class _ChatScreenState extends State<ChatScreen> {
       providers: [
         BlocProvider<ChatLoaderBloc>(
           create: (BuildContext context) => _chatLoaderBloc,
+        ),
+        BlocProvider<ChatRequestBloc>(
+          create: (BuildContext context) => _chatRequestBloc,
         )
       ],
       child: Scaffold(
@@ -44,6 +54,16 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         body: Column(
           children: [
+            BlocListener<ChatRequestBloc, ChatRequestState>(
+              listener: (BuildContext context, ChatRequestState state) {
+                if (state is OnTranslateSuccessState) {
+                  _chatLoaderBloc.add(OnAddNewMessageEvent(
+                      toTranslateText: state.toTranslateText,
+                      translatedText: state.translatedText));
+                }
+              },
+              child: SizedBox.shrink(),
+            ),
             Container(
               height: MediaQuery.of(context).size.height * 0.03,
               width: double.infinity,
@@ -87,12 +107,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               if (isChatMe) {
                                 return ChatMe(
                                   text: chat.text,
-                                  image: chat.assetIcon,
+                                  image: chat.getIsMeIcon(),
                                 );
                               }
                               return ChatReception(
                                 text: chat.text,
-                                image: chat.assetIcon,
+                                image: chat.getIsMeIcon(),
                               );
                             }),
                       );
@@ -124,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         Image(
                           width: MediaQuery.of(context).size.width * .065,
                           height: MediaQuery.of(context).size.width * .065,
-                          image: AssetImage('khmer_flag_round.png'),
+                          image: AssetImage('assets/japan_english.png'),
                         ),
                         Positioned.fill(
                             child: Material(
@@ -140,6 +160,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
+                        controller: _messageEditingTextCtrl,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.only(
                               left: MediaQuery.of(context).size.width * .07),
@@ -158,7 +179,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         )),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      print("ON SEND CLICK");
+                      _chatRequestBloc.add(
+                          OnSubmitMessageEvent(_messageEditingTextCtrl.text));
+                    },
                     child: Container(
                       width: MediaQuery.of(context).size.width * .08,
                       height: MediaQuery.of(context).size.width * .08,
