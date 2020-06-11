@@ -15,7 +15,6 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
   @override
   Stream<ChatRequestState> mapEventToState(ChatRequestEvent event) async* {
     if (event is OnSubmitMessageEvent) {
-      print("ON SUMIT MESSSAGE BLOC ${event.text}");
       _translate(event.text);
     }
 
@@ -30,7 +29,6 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
   void _translate(String toTranslate) async {
     _translator.baseUrl = "https://translate.google.cn/translate_a/single";
     _translator.translate(toTranslate, from: _from, to: _to).then((value) {
-      print("ON TRANSLATE SUCCESS $value");
       add(OnTranslateSuccessEvent(
           translatedText: value, toTranslateText: toTranslate));
     }).catchError((onError) {

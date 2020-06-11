@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:translateapp/bloc/chat_loader/ChatLoaderBloc.dart';
+import 'package:translateapp/bloc/chat_loader/chat_loader_bloc.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_bloc.dart';
@@ -27,8 +27,48 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    _chatLoaderBloc.loadChats();
+    _chatLoaderBloc.add(InitializeChatEvent());
     super.initState();
+  }
+
+  Widget _getSendButton({Function onClick}) {
+    return InkWell(
+      onTap: onClick,
+      child: Container(
+        width: MediaQuery.of(context).size.width * .08,
+        height: MediaQuery.of(context).size.width * .08,
+        child: SvgPicture.asset('assets/send_icon.svg'),
+      ),
+    );
+  }
+
+  Widget _getMessageTextField(bool isEnable) {
+    return TextField(
+        enabled: isEnable,
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
+        controller: _messageEditingTextCtrl,
+        decoration: InputDecoration(
+          contentPadding:
+              EdgeInsets.only(left: MediaQuery.of(context).size.width * .07),
+          hintText: 'Type something...',
+          hintStyle: TextStyle(color: Colors.grey.withOpacity(.7)),
+          disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.transparent)),
+          enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.transparent)),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.transparent)),
+        ));
+  }
+
+  Widget _getEmptyChatWidget() {
+    return Center(
+      child: Text(
+        'No chat yet!',
+        style: TextStyle(color: Colors.grey),
+      ),
+    );
   }
 
   @override
@@ -57,6 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
             BlocListener<ChatRequestBloc, ChatRequestState>(
               listener: (BuildContext context, ChatRequestState state) {
                 if (state is OnTranslateSuccessState) {
+                  _messageEditingTextCtrl.text = '';
                   _chatLoaderBloc.add(OnAddNewMessageEvent(
                       toTranslateText: state.toTranslateText,
                       translatedText: state.translatedText));
@@ -76,15 +117,18 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
                   builder: (BuildContext context, ChatLoaderState state) {
                     if (state is OnLoadChatState) {
+                      bool noChatsYet = state.chats.length == 0;
+                      if (noChatsYet) {
+                        return _getEmptyChatWidget();
+                      }
                       return NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification scrollInfo) {
-                          if (scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent) {
-                            if (state.currentOfflineLength <
-                                state.allOfflineLength) {
-                              _chatLoaderBloc.add(OnChatLoadMoreEvent());
-                            }
-                            return true;
+                          bool shouldLoadMore = scrollInfo.metrics.pixels ==
+                                  scrollInfo.metrics.maxScrollExtent &&
+                              state.currentOfflineLength <
+                                  state.allOfflineLength;
+                          if (shouldLoadMore) {
+                            _chatLoaderBloc.add(OnLoadMoreEvent());
                           }
                           return false;
                         },
@@ -157,38 +201,25 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Expanded(
-                    child: TextField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        controller: _messageEditingTextCtrl,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width * .07),
-                          hintText: 'Type something...',
-                          hintStyle:
-                              TextStyle(color: Colors.grey.withOpacity(.7)),
-                          disabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.transparent)),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.transparent)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.transparent)),
-                        )),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      print("ON SEND CLICK");
-                      _chatRequestBloc.add(
-                          OnSubmitMessageEvent(_messageEditingTextCtrl.text));
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * .08,
-                      height: MediaQuery.of(context).size.width * .08,
-                      child: SvgPicture.asset('assets/send_icon.svg'),
+                    child: BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
+                      builder: (BuildContext context, ChatLoaderState state) {
+                        if (state is OnLoadChatState) {
+                          return _getMessageTextField(true);
+                        }
+                        return _getMessageTextField(false);
+                      },
                     ),
+                  ),
+                  BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
+                    builder: (BuildContext context, ChatLoaderState state) {
+                      if (state is OnLoadChatState) {
+                        return _getSendButton(onClick: () {
+                          _chatRequestBloc.add(OnSubmitMessageEvent(
+                              _messageEditingTextCtrl.text));
+                        });
+                      }
+                      return _getSendButton();
+                    },
                   )
                 ],
               ),
