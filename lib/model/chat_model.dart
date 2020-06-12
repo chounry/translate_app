@@ -12,7 +12,7 @@ class ChatModel {
   final String text;
   //if isMe == true => the chat is the main language
   @HiveField(1)
-  final bool isMe;
+  bool isMe;
 
   ChatModel({@required this.text, @required this.isMe});
 

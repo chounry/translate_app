@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +12,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   int _currentOfflineLength = 0;
   List<ChatModel> _chatsToDisplay = [];
   List<ChatModel> _chatFromLocal = [];
+  bool _isSwap = false;
 
   @override
   ChatLoaderState get initialState => ChatLoaderState();
@@ -37,12 +37,33 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     if (event is InitializeChatEvent) {
       _initializeHive();
     }
+
+    if (event is OnSwapLanguageEvent) {
+      yield ChatLoaderState();
+      _isSwap = !_isSwap;
+      _reset();
+    }
   }
 
-  void _loadAllLocal() {
-    Box box = Hive.box('translate_app');
-    _chatFromLocal = (box.get('chat') as List)?.cast<ChatModel>();
-    _chatFromLocal = _chatFromLocal == null ? [] : _chatFromLocal;
+  void _reset() async{
+    if (Hive.isBoxOpen('translate_app')) {
+      // this prevent getting the old edited chat
+      await Hive.close();
+    }
+    _chatsToDisplay = [];
+    _currentOfflineLength = 0;
+    _loadAllLocal();
+  }
+
+  void _loadAllLocal() async {
+    Box box = await Hive.openBox('translate_app');
+    List<ChatModel> chats = (box.get('chat') as List)?.cast<ChatModel>();
+    chats.forEach((chat) {
+    });
+
+    _chatFromLocal = chats;
+    _chatFromLocal = _chatFromLocal ?? [];
+
     _loadChats();
   }
 
@@ -60,11 +81,31 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
                   _currentOfflineLength, _currentOfflineLength + PAGE_SIZE)
               .toList();
         }
+        if (_isSwap) {
+          chats = chats.map((chat) {
+            chat.isMe = !chat.isMe;
+            return chat;
+          }).toList();
+          chats = _switchChat(chats);
+        }
         _chatsToDisplay.addAll(chats);
         _currentOfflineLength += PAGE_SIZE;
       }
       add(OnChatLoadedEvent());
     });
+  }
+
+  List<ChatModel> _switchChat(List<ChatModel> chats){
+    List<ChatModel> switchedChats = [];
+    for(int i = 0; i< chats.length; i+=2){
+      ChatModel firstChat = chats[i];
+      ChatModel secondChat = chats[i+1];
+
+      switchedChats.insert(switchedChats.length, secondChat);
+      switchedChats.insert(switchedChats.length, firstChat);
+    }
+
+    return switchedChats;
   }
 
   void _addMessageFromStart(List<ChatModel> chats) {
@@ -79,12 +120,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocDir.path);
     Hive.registerAdapter(ChatModelAdapter());
-    await Hive.openBox('translate_app');
     _loadAllLocal();
   }
 
-  void _saveToLocal() {
-    Box box = Hive.box('translate_app');
+  void _saveToLocal() async {
+    Box box = await Hive.openBox('translate_app');
     box.put('chat', _chatFromLocal);
   }
 }
