@@ -57,11 +57,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   void _loadAllLocal() async {
     Box box = await Hive.openBox('translate_app');
-    List<ChatModel> chats = (box.get('chat') as List)?.cast<ChatModel>();
-    chats.forEach((chat) {
-    });
-
-    _chatFromLocal = chats;
+    _chatFromLocal = (box.get('chat') as List)?.cast<ChatModel>();
     _chatFromLocal = _chatFromLocal ?? [];
 
     _loadChats();

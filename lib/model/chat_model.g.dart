@@ -19,16 +19,19 @@ class ChatModelAdapter extends TypeAdapter<ChatModel> {
     return ChatModel(
       text: fields[0] as String,
       isMe: fields[1] as bool,
+      icon: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ChatModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.text)
       ..writeByte(1)
-      ..write(obj.isMe);
+      ..write(obj.isMe)
+      ..writeByte(2)
+      ..write(obj.icon);
   }
 }

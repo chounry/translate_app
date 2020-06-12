@@ -20,9 +20,11 @@ class OnAddNewMessageEvent extends ChatLoaderEvent {
 
   List<ChatModel> getChats() {
     List<ChatModel> chats = [];
-    ChatModel chat = ChatModel(isMe: false, text: translatedText);
+    ChatModel chat = ChatModel(
+        isMe: false, text: translatedText, icon: ChatModel.CHAT_RECEPTION_ICON);
     chats.add(chat);
-    chat = ChatModel(isMe: true, text: toTranslateText);
+    chat = ChatModel(
+        isMe: true, text: toTranslateText, icon: ChatModel.CHAT_ME_ICON);
     chats.add(chat);
 
     return chats;
