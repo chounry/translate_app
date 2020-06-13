@@ -125,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         onNotification: (ScrollNotification scrollInfo) {
                           bool shouldLoadMore = scrollInfo.metrics.pixels ==
                                   scrollInfo.metrics.maxScrollExtent &&
-                              state.currentOfflineLength <
+                              state.currentOfflineIndex <
                                   state.allOfflineLength;
                           if (shouldLoadMore) {
                             _chatLoaderBloc.add(OnLoadMoreEvent());
@@ -133,14 +133,14 @@ class _ChatScreenState extends State<ChatScreen> {
                           return false;
                         },
                         child: ListView.builder(
-                            itemCount: (state.currentOfflineLength <=
+                            itemCount: (state.currentOfflineIndex <
                                     state.allOfflineLength)
                                 ? state.chats.length + 1
                                 : state.chats.length,
                             reverse: true,
                             itemBuilder: (BuildContext context, int index) {
                               if (index == state.chats.length &&
-                                  state.currentOfflineLength <
+                                  state.currentOfflineIndex <
                                       state.allOfflineLength) {
                                 return Center(
                                   child: CircularProgressIndicator(),

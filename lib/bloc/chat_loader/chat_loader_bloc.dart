@@ -9,7 +9,7 @@ import 'package:translateapp/model/chat_model.dart';
 
 class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   static const PAGE_SIZE = 10;
-  int _currentOfflineLength = 0;
+  int _currentOfflineIndex = 0;
   List<ChatModel> _chatsToDisplay = [];
   List<ChatModel> _chatFromLocal = [];
   bool _isSwap = false;
@@ -22,7 +22,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     if (event is OnChatLoadedEvent) {
       yield OnLoadChatState(
           allOfflineLength: _chatFromLocal.length,
-          currentOfflineLength: _currentOfflineLength,
+          currentOfflineIndex: _currentOfflineIndex,
           chats: _chatsToDisplay);
     }
 
@@ -51,7 +51,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       await Hive.close();
     }
     _chatsToDisplay = [];
-    _currentOfflineLength = 0;
+    _currentOfflineIndex = 0;
     _loadAllLocal();
   }
 
@@ -66,15 +66,15 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   void _loadChats() async {
     Future.delayed(Duration(milliseconds: 500), () {
       List<ChatModel> chats = [];
-      if (_currentOfflineLength < _chatFromLocal.length) {
-        if ((_currentOfflineLength + PAGE_SIZE) > _chatFromLocal.length) {
+      if (_currentOfflineIndex < _chatFromLocal.length) {
+        if ((_currentOfflineIndex + PAGE_SIZE) > _chatFromLocal.length) {
           chats = _chatFromLocal
-              .getRange(_currentOfflineLength, _chatFromLocal.length)
+              .getRange(_currentOfflineIndex, _chatFromLocal.length)
               .toList();
         } else {
           chats = _chatFromLocal
               .getRange(
-                  _currentOfflineLength, _currentOfflineLength + PAGE_SIZE)
+                  _currentOfflineIndex, _currentOfflineIndex + PAGE_SIZE)
               .toList();
         }
         if (_isSwap) {
@@ -85,7 +85,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
           chats = _switchChat(chats);
         }
         _chatsToDisplay.addAll(chats);
-        _currentOfflineLength += PAGE_SIZE;
+        _currentOfflineIndex += PAGE_SIZE;
       }
       add(OnChatLoadedEvent());
     });
@@ -105,10 +105,10 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   }
 
   void _addMessageFromStart(List<ChatModel> chats) {
-    print("_addMessageFromStart ${chats.length}");
     _chatsToDisplay.insertAll(0, chats);
     _chatFromLocal.insertAll(0, chats);
     _saveToLocal();
+    _currentOfflineIndex += 2;
     add(OnChatLoadedEvent());
   }
 

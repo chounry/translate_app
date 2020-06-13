@@ -5,11 +5,11 @@ class ChatLoaderState {}
 
 class OnLoadChatState extends ChatLoaderState {
   final List<ChatModel> chats;
-  final int currentOfflineLength;
+  final int currentOfflineIndex;
   final int allOfflineLength;
 
   OnLoadChatState(
       {@required this.chats,
-      @required this.currentOfflineLength,
+      @required this.currentOfflineIndex,
       @required this.allOfflineLength});
 }
