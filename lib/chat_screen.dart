@@ -216,8 +216,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     builder: (BuildContext context, ChatLoaderState state) {
                       if (state is OnLoadChatState) {
                         return _getSendButton(onClick: () {
-                          _chatRequestBloc.add(OnSubmitMessageEvent(
-                              _messageEditingTextCtrl.text));
+                          if (_messageEditingTextCtrl.text.isNotEmpty) {
+                            _chatRequestBloc.add(OnSubmitMessageEvent(
+                                _messageEditingTextCtrl.text));
+                          }
                         });
                       }
                       return _getSendButton();
