@@ -5,7 +5,7 @@ part 'chat_model.g.dart';
 
 @HiveType(typeId: 1)
 class ChatModel {
-  static const String CHAT_ME_ICON = 'assets/khmer_flag.png';
+  static const String CHAT_ME_ICON = 'assets/england_flag.jpg';
   static const String CHAT_RECEPTION_ICON = 'assets/japan_flag.png';
 
   @HiveField(0)

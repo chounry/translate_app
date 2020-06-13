@@ -100,7 +100,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   _messageEditingTextCtrl.text = '';
                   _chatLoaderBloc.add(OnAddNewMessageEvent(
                       toTranslateText: state.toTranslateText,
-                      translatedText: state.translatedText));
+                      translatedText: state.translatedText,
+                      isSwap: state.isSwap));
                 }
               },
               child: SizedBox.shrink(),
@@ -196,6 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: InkWell(
                             onTap: () {
                               _chatLoaderBloc.add(OnSwapLanguageEvent());
+                              _chatRequestBloc.add(OnSwitchLanguageEvent());
                             },
                           ),
                         ))

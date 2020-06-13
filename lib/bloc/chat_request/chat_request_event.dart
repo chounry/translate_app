@@ -8,9 +8,12 @@ class OnSubmitMessageEvent extends ChatRequestEvent {
   OnSubmitMessageEvent(this.text);
 }
 
-class OnTranslateSuccessEvent extends ChatRequestEvent{
+class OnTranslateSuccessEvent extends ChatRequestEvent {
   final String toTranslateText;
   final String translatedText;
 
-  OnTranslateSuccessEvent({@required this.translatedText,@required this.toTranslateText});
+  OnTranslateSuccessEvent(
+      {@required this.translatedText, @required this.toTranslateText});
 }
+
+class OnSwitchLanguageEvent extends ChatRequestEvent {}

@@ -8,6 +8,7 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
   GoogleTranslator _translator = new GoogleTranslator();
   String _from = 'en';
   String _to = 'ja';
+  bool _isSwap = false;
 
   @override
   ChatRequestState get initialState => ChatRequestState();
@@ -19,10 +20,15 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
     }
 
     if (event is OnTranslateSuccessEvent) {
-      print("ONTRANSLATE S ${event.translatedText} ${event.toTranslateText}");
       yield OnTranslateSuccessState(
           translatedText: event.translatedText,
-          toTranslateText: event.toTranslateText);
+          toTranslateText: event.toTranslateText,
+          isSwap: _isSwap);
+    }
+
+    if (event is OnSwitchLanguageEvent) {
+      _isSwap = !_isSwap;
+      _switchLanguage();
     }
   }
 
@@ -34,5 +40,11 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
     }).catchError((onError) {
       print("TRANSLATE ERROR :: $onError");
     });
+  }
+
+  void _switchLanguage() {
+    String tmp = _from;
+    _from = _to;
+    _to = tmp;
   }
 }

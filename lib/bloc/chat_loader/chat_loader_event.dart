@@ -14,17 +14,25 @@ class OnSwapLanguageEvent extends ChatLoaderEvent {}
 class OnAddNewMessageEvent extends ChatLoaderEvent {
   final String toTranslateText;
   final String translatedText;
+  final isSwap;
 
   OnAddNewMessageEvent(
-      {@required this.toTranslateText, @required this.translatedText});
+      {@required this.toTranslateText,
+      @required this.translatedText,
+      @required this.isSwap});
 
   List<ChatModel> getChats() {
     List<ChatModel> chats = [];
+    String chatMeIcon =
+        !isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+    String chatReceptionIcon =
+        isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+
     ChatModel chat = ChatModel(
-        isMe: false, text: translatedText, icon: ChatModel.CHAT_RECEPTION_ICON);
+        isMe: false, text: translatedText, icon: chatReceptionIcon);
     chats.add(chat);
     chat = ChatModel(
-        isMe: true, text: toTranslateText, icon: ChatModel.CHAT_ME_ICON);
+        isMe: true, text: toTranslateText, icon: chatMeIcon);
     chats.add(chat);
 
     return chats;
