@@ -183,26 +183,68 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ClipOval(
-                    child: Stack(
-                      children: [
-                        Image(
-                          width: MediaQuery.of(context).size.width * .065,
-                          height: MediaQuery.of(context).size.width * .065,
-                          image: AssetImage('assets/japan_english.png'),
-                        ),
-                        Positioned.fill(
-                            child: Material(
-                          type: MaterialType.transparency,
-                          child: InkWell(
-                            onTap: () {
-                              _chatLoaderBloc.add(OnSwapLanguageEvent());
-                              _chatRequestBloc.add(OnSwitchLanguageEvent());
-                            },
+                  BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
+                    builder: (BuildContext context, ChatLoaderState state) {
+                      if (state is OnLoadChatState) {
+                        if (state.isSwap) {
+                          return ClipOval(
+                            child: Stack(
+                              children: [
+                                Image(
+                                  width:
+                                      MediaQuery.of(context).size.width * .065,
+                                  height:
+                                      MediaQuery.of(context).size.width * .065,
+                                  image: AssetImage('assets/japan_english.png'),
+                                ),
+                                Positioned.fill(
+                                    child: Material(
+                                  type: MaterialType.transparency,
+                                  child: InkWell(
+                                    onTap: () {
+                                      _chatLoaderBloc
+                                          .add(OnSwapLanguageEvent());
+                                      _chatRequestBloc
+                                          .add(OnSwitchLanguageEvent());
+                                    },
+                                  ),
+                                ))
+                              ],
+                            ),
+                          );
+                        }
+                        return ClipOval(
+                          child: Stack(
+                            children: [
+                              Image(
+                                width: MediaQuery.of(context).size.width * .065,
+                                height:
+                                    MediaQuery.of(context).size.width * .065,
+                                image: AssetImage('assets/english_japan.png'),
+                              ),
+                              Positioned.fill(
+                                  child: Material(
+                                type: MaterialType.transparency,
+                                child: InkWell(
+                                  onTap: () {
+                                    _chatLoaderBloc.add(OnSwapLanguageEvent());
+                                    _chatRequestBloc
+                                        .add(OnSwitchLanguageEvent());
+                                  },
+                                ),
+                              ))
+                            ],
                           ),
-                        ))
-                      ],
-                    ),
+                        );
+                      }
+                      return Container(
+                        width: MediaQuery.of(context).size.width * .065,
+                        height: MediaQuery.of(context).size.width * .065,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.grey.withOpacity(.5),
+                        ),
+                      );
+                    },
                   ),
                   Expanded(
                     child: BlocBuilder<ChatLoaderBloc, ChatLoaderState>(

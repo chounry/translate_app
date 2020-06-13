@@ -23,7 +23,8 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       yield OnLoadChatState(
           allOfflineLength: _chatFromLocal.length,
           currentOfflineIndex: _currentOfflineIndex,
-          chats: _chatsToDisplay);
+          chats: _chatsToDisplay,
+          isSwap: _isSwap);
     }
 
     if (event is OnLoadMoreEvent) {
@@ -45,7 +46,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     }
   }
 
-  void _reset() async{
+  void _reset() async {
     if (Hive.isBoxOpen('translate_app')) {
       // this prevent getting the old edited chat
       await Hive.close();
@@ -73,8 +74,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
               .toList();
         } else {
           chats = _chatFromLocal
-              .getRange(
-                  _currentOfflineIndex, _currentOfflineIndex + PAGE_SIZE)
+              .getRange(_currentOfflineIndex, _currentOfflineIndex + PAGE_SIZE)
               .toList();
         }
         if (_isSwap) {
@@ -91,11 +91,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     });
   }
 
-  List<ChatModel> _switchChat(List<ChatModel> chats){
+  List<ChatModel> _switchChat(List<ChatModel> chats) {
     List<ChatModel> switchedChats = [];
-    for(int i = 0; i< chats.length; i+=2){
+    for (int i = 0; i < chats.length; i += 2) {
       ChatModel firstChat = chats[i];
-      ChatModel secondChat = chats[i+1];
+      ChatModel secondChat = chats[i + 1];
 
       switchedChats.insert(switchedChats.length, secondChat);
       switchedChats.insert(switchedChats.length, firstChat);
