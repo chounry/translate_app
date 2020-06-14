@@ -86,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: Color(0xffF7F7F7),
         appBar: AppBar(
           title: Text(
-            'Khmer English Translator',
+            'English Japan Translator',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: Colors.white,
