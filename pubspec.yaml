@@ -32,7 +32,7 @@ dependencies:
   translator: ^0.1.4
 
   flutter_tts: ^1.2.0 # sound
-#  firebase_admob: ^0.9.3+2 # advertisement
+  firebase_admob: ^0.9.3+2 # advertisement
 
 
   # The following adds the Cupertino Icons font to your application.

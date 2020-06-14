@@ -105,11 +105,8 @@ class _ChatScreenState extends State<ChatScreen> {
               },
               child: SizedBox.shrink(),
             ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.03,
-              width: double.infinity,
-              child: Image.network(
-                  'https://www.designcontest.com/blog/wp-content/uploads/2015/07/banner-ad-fail-11.jpg'),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * .1,
             ),
             Expanded(
               child: Padding(
