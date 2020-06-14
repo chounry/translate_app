@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:translateapp/model/chat_model.dart';
 
 class ChatRequestEvent {}
 
@@ -9,11 +10,9 @@ class OnSubmitMessageEvent extends ChatRequestEvent {
 }
 
 class OnTranslateSuccessEvent extends ChatRequestEvent {
-  final String toTranslateText;
-  final String translatedText;
+  final List<ChatModel> chatToDisplay;
 
-  OnTranslateSuccessEvent(
-      {@required this.translatedText, @required this.toTranslateText});
+  OnTranslateSuccessEvent(this.chatToDisplay);
 }
 
 class OnSwitchLanguageEvent extends ChatRequestEvent {}

@@ -43,7 +43,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     }
 
     if (event is OnAddNewMessageEvent) {
-      _addMessageFromStart(event.getChats());
+      _addMessageFromStart(event.chatToDisplay);
     }
 
     if (event is InitializeChatEvent) {
@@ -105,7 +105,10 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     Box box = await Hive.openBox('translate_app');
     _chatFromLocal = (box.get('chat') as List)?.cast<ChatModel>();
     _chatFromLocal = _chatFromLocal ?? [];
-
+    if (Hive.isBoxOpen('translate_app')) {
+      // this prevent getting the old edited chat
+      await Hive.close();
+    }
     _loadChats();
   }
 
@@ -151,8 +154,6 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   void _addMessageFromStart(List<ChatModel> chats) {
     _chatsToDisplay.insertAll(0, chats);
-    _chatFromLocal.insertAll(0, chats);
-    _saveToLocal();
     _currentOfflineIndex += 2;
     add(OnChatLoadedEvent());
   }
@@ -162,10 +163,5 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     Hive.init(appDocDir.path);
     Hive.registerAdapter(ChatModelAdapter());
     _loadAllLocal();
-  }
-
-  void _saveToLocal() async {
-    Box box = await Hive.openBox('translate_app');
-    box.put('chat', _chatFromLocal);
   }
 }

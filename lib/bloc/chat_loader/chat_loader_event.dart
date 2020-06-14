@@ -18,30 +18,49 @@ class OnSpeakClickEvent extends ChatLoaderEvent {
 }
 
 class OnAddNewMessageEvent extends ChatLoaderEvent {
-  final String toTranslateText;
-  final String translatedText;
-  final isSwap;
+  final List<ChatModel> chatToDisplay;
 
-  OnAddNewMessageEvent(
-      {@required this.toTranslateText,
-      @required this.translatedText,
-      @required this.isSwap});
+  OnAddNewMessageEvent(this.chatToDisplay);
 
-  List<ChatModel> getChats() {
-    List<ChatModel> chats = [];
-    String chatMeIcon =
-        !isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
-    String chatReceptionIcon =
-        isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+//  List<ChatModel> getChats() {
+//    List<ChatModel> chats = [];
+//    String chatMeIcon =
+//        !isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+//    String chatReceptionIcon =
+//        isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+//
+//    if (isSwap) {
+//      ChatModel chat = ChatModel(
+//          isMe: false,
+//          text: toTranslateText,
+//          icon: ChatModel.CHAT_RECEPTION_ICON);
+//      chats.add(chat);
+//      chat = ChatModel(
+//          isMe: true, text: translatedText, icon: ChatModel.CHAT_ME_ICON);
+//      chats.add(chat);
+//    } else {
+//      ChatModel chat = ChatModel(
+//          isMe: false,
+//          text: translatedText,
+//          icon: ChatModel.CHAT_RECEPTION_ICON);
+//      chats.add(chat);
+//      chat = ChatModel(
+//          isMe: true, text: toTranslateText, icon: ChatModel.CHAT_ME_ICON);
+//      chats.add(chat);
+//    }
 
-    ChatModel chat =
-        ChatModel(isMe: false, text: translatedText, icon: chatReceptionIcon);
-    chats.add(chat);
-    chat = ChatModel(isMe: true, text: toTranslateText, icon: chatMeIcon);
-    chats.add(chat);
+//    ChatModel chat =
+//        ChatModel(isMe: false, text: translatedText, icon: chatReceptionIcon);
+//    chats.add(chat);
+//    chat = ChatModel(isMe: true, text: toTranslateText, icon: chatMeIcon);
+//    chats.add(chat);
 
-    return chats;
-  }
+//  return
+//
+//  chats
+
+//  ;
+//}
 }
 
 class InitializeChatEvent extends ChatLoaderEvent {}

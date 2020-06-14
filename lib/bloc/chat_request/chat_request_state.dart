@@ -1,16 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:translateapp/model/chat_model.dart';
 
 class ChatRequestState {}
 
 class OnTranslateSuccessState extends ChatRequestState {
-  final String toTranslateText;
-  final String translatedText;
-  final bool isSwap;
+  final List<ChatModel> chatsToDisplay;
 
-  OnTranslateSuccessState(
-      {@required this.toTranslateText,
-      @required this.translatedText,
-      @required this.isSwap});
+  OnTranslateSuccessState(this.chatsToDisplay);
 }
 
 class OnTranslateFailState extends ChatRequestState {}

@@ -97,11 +97,10 @@ class _ChatScreenState extends State<ChatScreen> {
             BlocListener<ChatRequestBloc, ChatRequestState>(
               listener: (BuildContext context, ChatRequestState state) {
                 if (state is OnTranslateSuccessState) {
+                  print("ON TRANSLATE SUCCESS ${state.chatsToDisplay.length}");
                   _messageEditingTextCtrl.text = '';
-                  _chatLoaderBloc.add(OnAddNewMessageEvent(
-                      toTranslateText: state.toTranslateText,
-                      translatedText: state.translatedText,
-                      isSwap: state.isSwap));
+                  _chatLoaderBloc
+                      .add(OnAddNewMessageEvent(state.chatsToDisplay));
                 }
               },
               child: SizedBox.shrink(),
