@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class ChatReception extends StatelessWidget {
   final String text;
   final String image;
-  final Function onListenClick;
+  final Function onSpeakClick;
 
   const ChatReception(
-      {Key key, @required this.text, @required this.image, this.onListenClick})
+      {Key key, @required this.text, @required this.image, this.onSpeakClick})
       : super(key: key); // TODO : put this to required
 
   @override
@@ -54,9 +54,7 @@ class ChatReception extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  print("ON CLICK");
-                },
+                onTap: onSpeakClick,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(

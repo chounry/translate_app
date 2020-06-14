@@ -156,6 +156,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                 );
                               }
                               return ChatReception(
+                                onSpeakClick: () {
+                                  _chatLoaderBloc.add(OnSpeakClickEvent(index));
+                                },
                                 text: chat.text,
                                 image: chat.getIsMeIcon(),
                               );

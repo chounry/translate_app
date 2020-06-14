@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
 import 'package:translateapp/model/chat_model.dart';
+
+enum TtsState { playing, stopped }
 
 class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   static const PAGE_SIZE = 10;
@@ -13,6 +16,14 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   List<ChatModel> _chatsToDisplay = [];
   List<ChatModel> _chatFromLocal = [];
   bool _isSwap = false;
+
+  // speak
+  FlutterTts flutterTts;
+  double volume = 0.5;
+  double pitch = 1.0;
+  double rate = 0.5;
+
+  TtsState ttsState = TtsState.stopped;
 
   @override
   ChatLoaderState get initialState => ChatLoaderState();
@@ -36,6 +47,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     }
 
     if (event is InitializeChatEvent) {
+      _initializeSpeak();
       _initializeHive();
     }
 
@@ -44,6 +56,39 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       _isSwap = !_isSwap;
       _reset();
     }
+
+    if (event is OnSpeakClickEvent) {
+      _speak(event.index);
+    }
+  }
+
+  void _initializeSpeak() {
+    flutterTts = FlutterTts();
+
+    flutterTts.setStartHandler(() {
+      print("playing");
+      ttsState = TtsState.playing;
+    });
+
+    flutterTts.setCompletionHandler(() {
+      print("Complete");
+      ttsState = TtsState.stopped;
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      print("error: $msg");
+      ttsState = TtsState.stopped;
+    });
+  }
+
+  Future _speak(int chatIndex) async {
+    await flutterTts.setVolume(volume);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(pitch);
+    String textToSpeak = _chatsToDisplay[chatIndex].text;
+
+    var result = await flutterTts.speak(textToSpeak);
+    if (result == 1) ttsState = TtsState.playing;
   }
 
   void _reset() async {
