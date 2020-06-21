@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:hive/hive.dart';
@@ -76,10 +75,6 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       yield ChatLoaderState();
       _isSwap = !_isSwap;
       _reset();
-    }
-
-    if (event is OnSpeakClickEvent) {
-      _speak(event.index);
     }
   }
 

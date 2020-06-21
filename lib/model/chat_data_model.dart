@@ -35,8 +35,4 @@ class ChatDataModel implements AbsChatModel {
 //    }
 //    return chats;
 //  }
-
-  String getIsMeIcon() {
-    return icon;
-  }
 }

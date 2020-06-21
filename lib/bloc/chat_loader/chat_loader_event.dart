@@ -15,12 +15,6 @@ class LoadAllLocalEvent extends ChatLoaderEvent {}
 
 class OnSwapLanguageEvent extends ChatLoaderEvent {}
 
-class OnSpeakClickEvent extends ChatLoaderEvent {
-  final int index;
-
-  OnSpeakClickEvent(this.index);
-}
-
 class OnRemoveChatLoadingEvent extends ChatLoaderEvent {}
 
 class OnAddTranslatedMessageEvent extends ChatLoaderEvent {

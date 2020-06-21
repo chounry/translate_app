@@ -225,15 +225,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               if (isChatMe) {
                                 return ChatMe(
                                   text: chat.text,
-                                  image: chat.getIsMeIcon(),
+                                  image: chat.icon,
                                 );
                               }
                               return ChatReception(
-                                onSpeakClick: () {
-                                  _chatLoaderBloc.add(OnSpeakClickEvent(index));
-                                },
                                 text: chat.text,
-                                image: chat.getIsMeIcon(),
+                                image: chat.icon,
                               );
                             }),
                       );
