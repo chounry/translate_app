@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_event.dart';
-import 'package:translateapp/model/chat_model.dart';
+import 'package:translateapp/model/chat_data_model.dart';
 import 'package:translator/translator.dart';
 
 import 'chat_request_state.dart';
@@ -18,6 +18,9 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
   @override
   Stream<ChatRequestState> mapEventToState(ChatRequestEvent event) async* {
     if (event is OnSubmitMessageEvent) {
+      _saveEachToLocal(_getToTranslateChatToSave(event.text));
+      yield OnLoadToTranslateTextState(_getChatMeToDisplay(event.text));
+      await Future.delayed(Duration(seconds: 2));
       _translate(event.text);
     }
 
@@ -34,57 +37,65 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
   void _translate(String toTranslate) async {
     _translator.baseUrl = "https://translate.google.cn/translate_a/single";
     _translator.translate(toTranslate, from: _from, to: _to).then((value) {
-      add(OnTranslateSuccessEvent(_getChatsToDisplay(value, toTranslate)));
-      _saveToLocal(_getChatsToSave(value, toTranslate));
+      add(OnTranslateSuccessEvent(_getChatReceptionToDisplay(value)));
+      _saveEachToLocal(_getTranslatedChatToSave(value));
     }).catchError((onError) {
       print("TRANSLATE ERROR :: $onError");
     });
   }
 
-  List<ChatModel> _getChatsToSave(String translated, String toTranslate) {
-    List<ChatModel> chats = [];
+  ChatDataModel _getToTranslateChatToSave(String text) {
+    ChatDataModel chat;
 
     if (_isSwap) {
-      ChatModel chat = ChatModel(
-          isMe: false, text: toTranslate, icon: ChatModel.CHAT_RECEPTION_ICON);
-      chats.add(chat);
-      chat =
-          ChatModel(isMe: true, text: translated, icon: ChatModel.CHAT_ME_ICON);
-      chats.add(chat);
+      chat = ChatDataModel(
+          isMe: false, text: text, icon: ChatDataModel.CHAT_RECEPTION_ICON);
     } else {
-      ChatModel chat = ChatModel(
-          isMe: false, text: translated, icon: ChatModel.CHAT_RECEPTION_ICON);
-      chats.add(chat);
-      chat = ChatModel(
-          isMe: true, text: toTranslate, icon: ChatModel.CHAT_ME_ICON);
-      chats.add(chat);
+      chat = ChatDataModel(isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
     }
 
-    return chats;
+    return chat;
   }
 
-  List<ChatModel> _getChatsToDisplay(String translated, String toTranslate) {
-    List<ChatModel> chats = [];
-    String chatMeIcon =
-        _isSwap ? ChatModel.CHAT_RECEPTION_ICON : ChatModel.CHAT_ME_ICON;
-    String chatReceptionIcon =
-        _isSwap ? ChatModel.CHAT_ME_ICON : ChatModel.CHAT_RECEPTION_ICON;
+  ChatDataModel _getTranslatedChatToSave(String text) {
+    ChatDataModel chat;
 
-    ChatModel chatReception =
-        ChatModel(text: translated, isMe: false, icon: chatReceptionIcon);
-    chats.add(chatReception);
-    ChatModel chatMe =
-        ChatModel(text: toTranslate, isMe: true, icon: chatMeIcon);
-    chats.add(chatMe);
-    return chats;
+    if (!_isSwap) {
+      chat = ChatDataModel(
+          isMe: false, text: text, icon: ChatDataModel.CHAT_RECEPTION_ICON);
+    } else {
+      chat = ChatDataModel(isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
+    }
+
+    return chat;
   }
 
-  void _saveToLocal(List<ChatModel> chatToSave) async {
+  ChatDataModel _getChatMeToDisplay(String text) {
+    String chatIcon =
+        _isSwap ? ChatDataModel.CHAT_RECEPTION_ICON : ChatDataModel.CHAT_ME_ICON;
+    ChatDataModel chat = ChatDataModel(text: text, isMe: true, icon: chatIcon);
+    return chat;
+  }
+
+  ChatDataModel _getChatReceptionToDisplay(String text) {
+    String chatIcon =
+        _isSwap ? ChatDataModel.CHAT_ME_ICON : ChatDataModel.CHAT_RECEPTION_ICON;
+    ChatDataModel chat = ChatDataModel(text: text, isMe: false, icon: chatIcon);
+    return chat;
+  }
+
+  void _saveEachToLocal(ChatDataModel chatToSave) async {
+//    we always save the the translated('ja') txt at the index 1,
     Box box = await Hive.openBox('translate_app');
-    List<ChatModel> chatFromLocal =
-        (box.get('chat') as List)?.cast<ChatModel>();
+    List<ChatDataModel> chatFromLocal =
+        (box.get('chat') as List)?.cast<ChatDataModel>();
     chatFromLocal = chatFromLocal ?? [];
-    chatFromLocal.insertAll(0, chatToSave);
+    bool needChangeSaveIndex = _isSwap;
+    if (needChangeSaveIndex) {
+      chatFromLocal.insert(1, chatToSave);
+    } else {
+      chatFromLocal.insert(0, chatToSave);
+    }
     await box.put('chat', chatFromLocal);
 
     if (Hive.isBoxOpen('translate_app')) {

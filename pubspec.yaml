@@ -30,6 +30,7 @@ dependencies:
   hive_flutter: ^0.3.0+2
   path_provider: ^1.6.10
   translator: ^0.1.4
+  flutter_spinkit: ^4.1.2+1
 
   flutter_tts: ^1.2.0 # sound
   firebase_admob: ^0.9.3+2 # advertisement
@@ -67,6 +68,7 @@ flutter:
     - japan_english.png
     - english_japan.png
     - japan_flag.png
+    - chat_item_loading.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

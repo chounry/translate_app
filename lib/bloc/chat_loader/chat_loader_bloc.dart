@@ -6,15 +6,17 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
-import 'package:translateapp/model/chat_model.dart';
+import 'package:translateapp/model/abs_chat_model.dart';
+import 'package:translateapp/model/chat_data_model.dart';
+import 'package:translateapp/model/chat_loading_model.dart';
 
 enum TtsState { playing, stopped }
 
 class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   static const PAGE_SIZE = 10;
   int _currentOfflineIndex = 0;
-  List<ChatModel> _chatsToDisplay = [];
-  List<ChatModel> _chatFromLocal = [];
+  List<AbsChatModel> _chatsToDisplay = [];
+  List<ChatDataModel> _chatFromLocal = [];
   bool _isSwap = false;
 
   // speak
@@ -42,8 +44,16 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       _loadChats();
     }
 
-    if (event is OnAddNewMessageEvent) {
+    if (event is OnAddTranslatedMessageEvent) {
+      _removeChatLoading();
       _addMessageFromStart(event.chatToDisplay);
+      add(OnChatLoadedEvent());
+    }
+
+    if (event is LoadToTranslateChatEvent) {
+      _addMessageFromStart(event.chat);
+      _addMessageFromStart(ChatLoadingModel());
+      add(OnChatLoadedEvent());
     }
 
     if (event is InitializeChatEvent) {
@@ -85,7 +95,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     await flutterTts.setVolume(volume);
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
-    String textToSpeak = _chatsToDisplay[chatIndex].text;
+    String textToSpeak = (_chatsToDisplay[chatIndex] as ChatDataModel).text;
 
     var result = await flutterTts.speak(textToSpeak);
     if (result == 1) ttsState = TtsState.playing;
@@ -103,7 +113,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   void _loadAllLocal() async {
     Box box = await Hive.openBox('translate_app');
-    _chatFromLocal = (box.get('chat') as List)?.cast<ChatModel>();
+    _chatFromLocal = (box.get('chat') as List)?.cast<ChatDataModel>();
     _chatFromLocal = _chatFromLocal ?? [];
     if (Hive.isBoxOpen('translate_app')) {
       // this prevent getting the old edited chat
@@ -114,7 +124,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   void _loadChats() async {
     Future.delayed(Duration(milliseconds: 500), () {
-      List<ChatModel> chats = [];
+      List<ChatDataModel> chats = [];
       if (_currentOfflineIndex < _chatFromLocal.length) {
         if ((_currentOfflineIndex + PAGE_SIZE) > _chatFromLocal.length) {
           chats = _chatFromLocal
@@ -139,11 +149,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     });
   }
 
-  List<ChatModel> _switchChat(List<ChatModel> chats) {
-    List<ChatModel> switchedChats = [];
+  List<ChatDataModel> _switchChat(List<ChatDataModel> chats) {
+    List<ChatDataModel> switchedChats = [];
     for (int i = 0; i < chats.length; i += 2) {
-      ChatModel firstChat = chats[i];
-      ChatModel secondChat = chats[i + 1];
+      ChatDataModel firstChat = chats[i];
+      ChatDataModel secondChat = chats[i + 1];
 
       switchedChats.insert(switchedChats.length, secondChat);
       switchedChats.insert(switchedChats.length, firstChat);
@@ -152,16 +162,20 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     return switchedChats;
   }
 
-  void _addMessageFromStart(List<ChatModel> chats) {
-    _chatsToDisplay.insertAll(0, chats);
-    _currentOfflineIndex += 2;
-    add(OnChatLoadedEvent());
+  void _removeChatLoading() {
+    _chatsToDisplay.removeAt(0);
+    _currentOfflineIndex -= 1;
+  }
+
+  void _addMessageFromStart(AbsChatModel chat) {
+    _chatsToDisplay.insert(0, chat);
+    _currentOfflineIndex += 1;
   }
 
   void _initializeHive() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocDir.path);
-    Hive.registerAdapter(ChatModelAdapter());
+    Hive.registerAdapter(ChatDataModelAdapter());
     _loadAllLocal();
   }
 }

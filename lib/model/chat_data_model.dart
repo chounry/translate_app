@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:translateapp/model/abs_chat_model.dart';
 
-part 'chat_model.g.dart';
+part 'chat_data_model.g.dart';
 
 @HiveType(typeId: 1)
-class ChatModel {
+class ChatDataModel implements AbsChatModel {
   static const String CHAT_ME_ICON = 'assets/england_flag.jpg';
   static const String CHAT_RECEPTION_ICON = 'assets/japan_flag.png';
 
@@ -17,7 +18,8 @@ class ChatModel {
   @HiveField(2)
   final String icon;
 
-  ChatModel({@required this.text, @required this.isMe, @required this.icon});
+  ChatDataModel(
+      {@required this.text, @required this.isMe, @required this.icon});
 
 //  static List<ChatModel> getChats(int total) {
 //    bool isMe = true;

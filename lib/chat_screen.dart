@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_bloc.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_bloc.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_event.dart';
-import 'package:translateapp/model/chat_model.dart';
+import 'package:translateapp/model/chat_data_model.dart';
+import 'package:translateapp/model/chat_loading_model.dart';
 import 'package:translateapp/widget/chat_me.dart';
 import 'package:translateapp/widget/chat_reception.dart';
 
@@ -71,6 +73,54 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget _getChatLoadingItem() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width * 0.07,
+            height: MediaQuery.of(context).size.width * 0.07,
+            child: CircleAvatar(
+              backgroundImage: AssetImage(ChatDataModel.CHAT_ME_ICON),
+            ),
+          ),
+          SizedBox(
+            width: 5,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * .2,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10)),
+                    color: Color(0xff917ADC),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3))
+                    ]),
+                padding: EdgeInsets.all(10),
+                child: SpinKitThreeBounce(
+                  color: Colors.white,
+                  size: MediaQuery.of(context).size.width * .03,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -97,10 +147,12 @@ class _ChatScreenState extends State<ChatScreen> {
             BlocListener<ChatRequestBloc, ChatRequestState>(
               listener: (BuildContext context, ChatRequestState state) {
                 if (state is OnTranslateSuccessState) {
-                  print("ON TRANSLATE SUCCESS ${state.chatsToDisplay.length}");
+                  _chatLoaderBloc.add(OnAddTranslatedMessageEvent(state.chat));
+                }
+
+                if (state is OnLoadToTranslateTextState) {
                   _messageEditingTextCtrl.text = '';
-                  _chatLoaderBloc
-                      .add(OnAddNewMessageEvent(state.chatsToDisplay));
+                  _chatLoaderBloc.add(LoadToTranslateChatEvent(state.chat));
                 }
               },
               child: SizedBox.shrink(),
@@ -118,6 +170,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (noChatsYet) {
                         return _getEmptyChatWidget();
                       }
+                      print("Chat Screen all chat ${state.chats.length}");
                       return NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification scrollInfo) {
                           bool shouldLoadMore = scrollInfo.metrics.pixels ==
@@ -136,6 +189,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 : state.chats.length,
                             reverse: true,
                             itemBuilder: (BuildContext context, int index) {
+                              if (index == 0 &&
+                                  state.chats[0] is ChatLoadingModel) {
+                                return _getChatLoadingItem();
+                              }
                               if (index == state.chats.length &&
                                   state.currentOfflineIndex <
                                       state.allOfflineLength) {
@@ -143,7 +200,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                   child: CircularProgressIndicator(),
                                 );
                               }
-                              ChatModel chat = state.chats[index];
+                              print("CURRENT INDEX $index");
+                              ChatDataModel chat = state.chats[index];
                               bool isChatMe = chat.isMe;
                               if (isChatMe) {
                                 return ChatMe(

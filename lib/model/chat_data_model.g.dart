@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_model.dart';
+part of 'chat_data_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ChatModelAdapter extends TypeAdapter<ChatModel> {
+class ChatDataModelAdapter extends TypeAdapter<ChatDataModel> {
   @override
   final typeId = 1;
 
   @override
-  ChatModel read(BinaryReader reader) {
+  ChatDataModel read(BinaryReader reader) {
     var numOfFields = reader.readByte();
     var fields = <int, dynamic>{
       for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ChatModel(
+    return ChatDataModel(
       text: fields[0] as String,
       isMe: fields[1] as bool,
       icon: fields[2] as String,
@@ -24,7 +24,7 @@ class ChatModelAdapter extends TypeAdapter<ChatModel> {
   }
 
   @override
-  void write(BinaryWriter writer, ChatModel obj) {
+  void write(BinaryWriter writer, ChatDataModel obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)

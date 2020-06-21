@@ -1,11 +1,17 @@
-import 'package:translateapp/model/chat_model.dart';
+import 'package:translateapp/model/chat_data_model.dart';
 
 class ChatRequestState {}
 
 class OnTranslateSuccessState extends ChatRequestState {
-  final List<ChatModel> chatsToDisplay;
+  final ChatDataModel chat;
 
-  OnTranslateSuccessState(this.chatsToDisplay);
+  OnTranslateSuccessState(this.chat);
+}
+
+class OnLoadToTranslateTextState extends ChatRequestState {
+  final ChatDataModel chat;
+
+  OnLoadToTranslateTextState(this.chat);
 }
 
 class OnTranslateFailState extends ChatRequestState {}
