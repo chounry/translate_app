@@ -44,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _getMessageTextField(bool isEnable) {
+  Widget _getMessageTextField(bool isEnable, {String hintText}) {
     return TextField(
         enabled: isEnable,
         keyboardType: TextInputType.multiline,
@@ -53,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
         decoration: InputDecoration(
           contentPadding:
               EdgeInsets.only(left: MediaQuery.of(context).size.width * .07),
-          hintText: 'Type something...',
+          hintText: hintText ?? '',
           hintStyle: TextStyle(color: Colors.grey.withOpacity(.7)),
           disabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent)),
@@ -326,7 +326,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
                       builder: (BuildContext context, ChatLoaderState state) {
                         if (state is OnLoadChatState) {
-                          return _getMessageTextField(true);
+                          return _getMessageTextField(state.isInputEnable,
+                              hintText: state.inputHintText);
                         }
                         return _getMessageTextField(false);
                       },

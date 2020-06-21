@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
+import 'package:translateapp/config/config.dart';
 import 'package:translateapp/model/abs_chat_model.dart';
 import 'package:translateapp/model/chat_data_model.dart';
 import 'package:translateapp/model/chat_loading_model.dart';
@@ -38,7 +39,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
           allOfflineLength: _chatFromLocal.length,
           currentOfflineIndex: _currentOfflineIndex,
           chats: _chatsToDisplay,
-          isSwap: _isSwap);
+          isSwap: _isSwap,
+          inputHintText: _isSwap
+              ? Config.INPUT_HINT_TRANSLATED
+              : Config.INPUT_HINT_TO_TRANSLATE,
+      isInputEnable: event.isInputEnable);
     }
 
     if (event is OnLoadMoreEvent) {
@@ -47,19 +52,19 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
     if (event is OnRemoveChatLoadingEvent) {
       _removeChatLoading();
-      add(OnChatLoadedEvent());
+      add(OnChatLoadedEvent(true));
     }
 
     if (event is OnAddTranslatedMessageEvent) {
       _removeChatLoading();
       _addMessageFromStart(event.chatToDisplay);
-      add(OnChatLoadedEvent());
+      add(OnChatLoadedEvent(true));
     }
 
     if (event is LoadToTranslateChatEvent) {
       _addMessageFromStart(event.chat);
       _addMessageFromStart(ChatLoadingModel());
-      add(OnChatLoadedEvent());
+      add(OnChatLoadedEvent(false));
     }
 
     if (event is InitializeChatEvent) {
@@ -151,7 +156,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
         _chatsToDisplay.addAll(chats);
         _currentOfflineIndex += PAGE_SIZE;
       }
-      add(OnChatLoadedEvent());
+      add(OnChatLoadedEvent(true));
     });
   }
 

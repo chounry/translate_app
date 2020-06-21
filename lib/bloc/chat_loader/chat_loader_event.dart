@@ -3,7 +3,11 @@ import 'package:translateapp/model/chat_data_model.dart';
 
 class ChatLoaderEvent {}
 
-class OnChatLoadedEvent extends ChatLoaderEvent {}
+class OnChatLoadedEvent extends ChatLoaderEvent {
+  final bool isInputEnable;
+
+  OnChatLoadedEvent(this.isInputEnable);
+}
 
 class OnLoadMoreEvent extends ChatLoaderEvent {}
 
