@@ -73,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _getChatLoadingItem() {
+  Widget _getChatLoadingItem(String iconAsset) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
             width: MediaQuery.of(context).size.width * 0.07,
             height: MediaQuery.of(context).size.width * 0.07,
             child: CircleAvatar(
-              backgroundImage: AssetImage(ChatDataModel.CHAT_ME_ICON),
+              backgroundImage: AssetImage(iconAsset),
             ),
           ),
           SizedBox(
@@ -154,6 +154,23 @@ class _ChatScreenState extends State<ChatScreen> {
                   _messageEditingTextCtrl.text = '';
                   _chatLoaderBloc.add(LoadToTranslateChatEvent(state.chat));
                 }
+
+                if (state is OnTranslateFailState) {
+                  _chatLoaderBloc.add(OnRemoveChatLoadingEvent());
+                  AlertDialog errorDialog = AlertDialog(
+                    title: Text(state.errorMessage.title),
+                    content: Text(state.errorMessage.description),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Ok'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
+                  );
+                  showDialog(context: context, builder: (_) => errorDialog);
+                }
               },
               child: SizedBox.shrink(),
             ),
@@ -191,7 +208,9 @@ class _ChatScreenState extends State<ChatScreen> {
                             itemBuilder: (BuildContext context, int index) {
                               if (index == 0 &&
                                   state.chats[0] is ChatLoadingModel) {
-                                return _getChatLoadingItem();
+                                return _getChatLoadingItem(state.isSwap
+                                    ? ChatDataModel.CHAT_ME_ICON
+                                    : ChatDataModel.CHAT_RECEPTION_ICON);
                               }
                               if (index == state.chats.length &&
                                   state.currentOfflineIndex <

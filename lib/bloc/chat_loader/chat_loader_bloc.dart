@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:hive/hive.dart';
@@ -42,6 +43,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
     if (event is OnLoadMoreEvent) {
       _loadChats();
+    }
+
+    if (event is OnRemoveChatLoadingEvent) {
+      _removeChatLoading();
+      add(OnChatLoadedEvent());
     }
 
     if (event is OnAddTranslatedMessageEvent) {
@@ -151,11 +157,15 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   List<ChatDataModel> _switchChat(List<ChatDataModel> chats) {
     List<ChatDataModel> switchedChats = [];
+
     for (int i = 0; i < chats.length; i += 2) {
       ChatDataModel firstChat = chats[i];
-      ChatDataModel secondChat = chats[i + 1];
 
-      switchedChats.insert(switchedChats.length, secondChat);
+      if (chats.length > i + 1) {
+        ChatDataModel secondChat = chats[i + 1];
+        switchedChats.insert(switchedChats.length, secondChat);
+      }
+
       switchedChats.insert(switchedChats.length, firstChat);
     }
 

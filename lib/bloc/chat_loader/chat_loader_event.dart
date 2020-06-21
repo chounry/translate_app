@@ -17,6 +17,8 @@ class OnSpeakClickEvent extends ChatLoaderEvent {
   OnSpeakClickEvent(this.index);
 }
 
+class OnRemoveChatLoadingEvent extends ChatLoaderEvent {}
+
 class OnAddTranslatedMessageEvent extends ChatLoaderEvent {
   final ChatDataModel chatToDisplay;
 

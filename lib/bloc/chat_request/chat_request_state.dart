@@ -1,4 +1,5 @@
 import 'package:translateapp/model/chat_data_model.dart';
+import 'package:translateapp/model/dialog_error_model.dart';
 
 class ChatRequestState {}
 
@@ -14,4 +15,8 @@ class OnLoadToTranslateTextState extends ChatRequestState {
   OnLoadToTranslateTextState(this.chat);
 }
 
-class OnTranslateFailState extends ChatRequestState {}
+class OnTranslateFailState extends ChatRequestState {
+  final DialogErrorModel errorMessage;
+
+  OnTranslateFailState(this.errorMessage);
+}

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_event.dart';
 import 'package:translateapp/model/chat_data_model.dart';
+import 'package:translateapp/model/dialog_error_model.dart';
 import 'package:translator/translator.dart';
 
 import 'chat_request_state.dart';
@@ -32,6 +35,10 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
       _isSwap = !_isSwap;
       _switchLanguage();
     }
+
+    if (event is OnTranslateFailEvent) {
+      yield OnTranslateFailState(event.errorMessage);
+    }
   }
 
   void _translate(String toTranslate) async {
@@ -40,6 +47,9 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
       add(OnTranslateSuccessEvent(_getChatReceptionToDisplay(value)));
       _saveEachToLocal(_getTranslatedChatToSave(value));
     }).catchError((onError) {
+      DialogErrorModel errorMessage = DialogErrorModel('Something Went Wrong',
+          'Something wrong with the connection between server and the device.');
+      add(OnTranslateFailEvent(errorMessage));
       print("TRANSLATE ERROR :: $onError");
     });
   }
@@ -51,7 +61,8 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
       chat = ChatDataModel(
           isMe: false, text: text, icon: ChatDataModel.CHAT_RECEPTION_ICON);
     } else {
-      chat = ChatDataModel(isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
+      chat = ChatDataModel(
+          isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
     }
 
     return chat;
@@ -64,22 +75,25 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
       chat = ChatDataModel(
           isMe: false, text: text, icon: ChatDataModel.CHAT_RECEPTION_ICON);
     } else {
-      chat = ChatDataModel(isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
+      chat = ChatDataModel(
+          isMe: true, text: text, icon: ChatDataModel.CHAT_ME_ICON);
     }
 
     return chat;
   }
 
   ChatDataModel _getChatMeToDisplay(String text) {
-    String chatIcon =
-        _isSwap ? ChatDataModel.CHAT_RECEPTION_ICON : ChatDataModel.CHAT_ME_ICON;
+    String chatIcon = _isSwap
+        ? ChatDataModel.CHAT_RECEPTION_ICON
+        : ChatDataModel.CHAT_ME_ICON;
     ChatDataModel chat = ChatDataModel(text: text, isMe: true, icon: chatIcon);
     return chat;
   }
 
   ChatDataModel _getChatReceptionToDisplay(String text) {
-    String chatIcon =
-        _isSwap ? ChatDataModel.CHAT_ME_ICON : ChatDataModel.CHAT_RECEPTION_ICON;
+    String chatIcon = _isSwap
+        ? ChatDataModel.CHAT_ME_ICON
+        : ChatDataModel.CHAT_RECEPTION_ICON;
     ChatDataModel chat = ChatDataModel(text: text, isMe: false, icon: chatIcon);
     return chat;
   }
