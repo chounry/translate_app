@@ -6,7 +6,7 @@ class SwitchLanguageButtonBloc
     extends Bloc<SwitchLanguageButtonEvent, SwitchLanguageButtonState> {
   @override
   SwitchLanguageButtonState get initialState =>
-      SwitchLanguageButtonState(false);
+      SwitchLanguageButtonState(true);
 
   @override
   Stream<SwitchLanguageButtonState> mapEventToState(
