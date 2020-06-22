@@ -19,4 +19,8 @@ class OnLoadChatState extends ChatLoaderState {
       @required this.isSwap,
       @required this.inputHintText,
       this.isInputEnable = true});
+
+  String getSwitchImage() {
+    return isSwap ? 'assets/japan_english.png' : 'assets/english_japan.png';
+  }
 }

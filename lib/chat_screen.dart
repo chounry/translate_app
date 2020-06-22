@@ -8,6 +8,9 @@ import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_bloc.dart';
 import 'package:translateapp/bloc/chat_request/chat_request_event.dart';
+import 'package:translateapp/bloc/switch_language_button/switch_language_button_bloc.dart';
+import 'package:translateapp/bloc/switch_language_button/switch_language_button_event.dart';
+import 'package:translateapp/bloc/switch_language_button/switch_language_button_state.dart';
 import 'package:translateapp/model/chat_data_model.dart';
 import 'package:translateapp/model/chat_loading_model.dart';
 import 'package:translateapp/widget/chat_me.dart';
@@ -24,6 +27,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   ChatLoaderBloc _chatLoaderBloc = ChatLoaderBloc();
   ChatRequestBloc _chatRequestBloc = ChatRequestBloc();
+  SwitchLanguageButtonBloc _switchLanguageButtonBloc =
+      SwitchLanguageButtonBloc();
 
   TextEditingController _messageEditingTextCtrl = TextEditingController();
 
@@ -121,6 +126,13 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Function _getOnSwitchClick() {
+    return () {
+      _chatLoaderBloc.add(OnSwapLanguageEvent());
+      _chatRequestBloc.add(OnSwitchLanguageEvent());
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -130,6 +142,9 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         BlocProvider<ChatRequestBloc>(
           create: (BuildContext context) => _chatRequestBloc,
+        ),
+        BlocProvider<SwitchLanguageButtonBloc>(
+          create: (BuildContext context) => _switchLanguageButtonBloc,
         )
       ],
       child: Scaffold(
@@ -170,6 +185,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   );
                   showDialog(context: context, builder: (_) => errorDialog);
+                }
+              },
+              child: SizedBox.shrink(),
+            ),
+            BlocListener<ChatRequestBloc, ChatRequestState>(
+              listener: (BuildContext context, ChatRequestState state) {
+                if (state is OnLoadToTranslateTextState) {
+                  _switchLanguageButtonBloc.add(OnDisableSwitchButtonEvent());
+                }
+
+                if (state is OnTranslateSuccessState) {
+                  _switchLanguageButtonBloc.add(OnEnableSwitchButtonEvent());
                 }
               },
               child: SizedBox.shrink(),
@@ -259,55 +286,35 @@ class _ChatScreenState extends State<ChatScreen> {
                   BlocBuilder<ChatLoaderBloc, ChatLoaderState>(
                     builder: (BuildContext context, ChatLoaderState state) {
                       if (state is OnLoadChatState) {
-                        if (state.isSwap) {
-                          return ClipOval(
-                            child: Stack(
-                              children: [
-                                Image(
-                                  width:
-                                      MediaQuery.of(context).size.width * .065,
-                                  height:
-                                      MediaQuery.of(context).size.width * .065,
-                                  image: AssetImage('assets/japan_english.png'),
-                                ),
-                                Positioned.fill(
-                                    child: Material(
-                                  type: MaterialType.transparency,
-                                  child: InkWell(
-                                    onTap: () {
-                                      _chatLoaderBloc
-                                          .add(OnSwapLanguageEvent());
-                                      _chatRequestBloc
-                                          .add(OnSwitchLanguageEvent());
-                                    },
+                        return BlocBuilder<SwitchLanguageButtonBloc,
+                            SwitchLanguageButtonState>(
+                          builder: (BuildContext context,
+                              SwitchLanguageButtonState switchBtnState) {
+                            Function onSwitchClick;
+                            if (switchBtnState.isEnable) {
+                              onSwitchClick = _getOnSwitchClick();
+                            }
+                            return ClipOval(
+                              child: Stack(
+                                children: [
+                                  Image(
+                                    width: MediaQuery.of(context).size.width *
+                                        .065,
+                                    height: MediaQuery.of(context).size.width *
+                                        .065,
+                                    image: AssetImage(state.getSwitchImage()),
                                   ),
-                                ))
-                              ],
-                            ),
-                          );
-                        }
-                        return ClipOval(
-                          child: Stack(
-                            children: [
-                              Image(
-                                width: MediaQuery.of(context).size.width * .065,
-                                height:
-                                    MediaQuery.of(context).size.width * .065,
-                                image: AssetImage('assets/english_japan.png'),
+                                  Positioned.fill(
+                                      child: Material(
+                                    type: MaterialType.transparency,
+                                    child: InkWell(
+                                      onTap: onSwitchClick,
+                                    ),
+                                  ))
+                                ],
                               ),
-                              Positioned.fill(
-                                  child: Material(
-                                type: MaterialType.transparency,
-                                child: InkWell(
-                                  onTap: () {
-                                    _chatLoaderBloc.add(OnSwapLanguageEvent());
-                                    _chatRequestBloc
-                                        .add(OnSwitchLanguageEvent());
-                                  },
-                                ),
-                              ))
-                            ],
-                          ),
+                            );
+                          },
                         );
                       }
                       return Container(
