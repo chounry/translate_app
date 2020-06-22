@@ -104,7 +104,7 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
     List<ChatDataModel> chatFromLocal =
         (box.get('chat') as List)?.cast<ChatDataModel>();
     chatFromLocal = chatFromLocal ?? [];
-    bool needChangeSaveIndex = _isSwap;
+    bool needChangeSaveIndex = _isSwap && chatToSave.isMe;
     if (needChangeSaveIndex) {
       chatFromLocal.insert(1, chatToSave);
     } else {
