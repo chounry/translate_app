@@ -83,11 +83,32 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     Box box = await Hive.openBox('translate_app');
     _chatFromLocal = (box.get('chat') as List)?.cast<ChatDataModel>();
     _chatFromLocal = _chatFromLocal ?? [];
+    bool shouldSaveInitialChat = _chatFromLocal.length == 0;
+    if (shouldSaveInitialChat) {
+      await _createInitialChats();
+    }
     if (Hive.isBoxOpen('translate_app')) {
       // this prevent getting the old edited chat
       await Hive.close();
     }
     _loadChats();
+  }
+
+  Future<void> _createInitialChats() async {
+    Box box = await Hive.openBox('translate_app');
+    List<ChatDataModel> chatsToSave = [];
+    ChatDataModel initialChat = ChatDataModel(
+        text: Config.INITIAL_TEXT,
+        isMe: false,
+        icon: ChatDataModel.CHAT_RECEPTION_ICON);
+    chatsToSave.add(initialChat);
+    await box.put('chat', chatsToSave);
+    _chatFromLocal = chatsToSave;
+
+    if (Hive.isBoxOpen('translate_app')) {
+      // this prevent getting the old edited chat
+      await Hive.close();
+    }
   }
 
   void _loadChats() async {
