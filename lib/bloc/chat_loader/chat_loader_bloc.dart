@@ -20,14 +20,6 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
   List<ChatDataModel> _chatFromLocal = [];
   bool _isSwap = false;
 
-  // speak
-  FlutterTts flutterTts;
-  double volume = 0.5;
-  double pitch = 1.0;
-  double rate = 0.5;
-
-  TtsState ttsState = TtsState.stopped;
-
   @override
   ChatLoaderState get initialState => ChatLoaderState();
 
@@ -42,7 +34,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
           inputHintText: _isSwap
               ? Config.INPUT_HINT_TRANSLATED
               : Config.INPUT_HINT_TO_TRANSLATE,
-      isInputEnable: event.isInputEnable);
+          isInputEnable: event.isInputEnable);
     }
 
     if (event is OnLoadMoreEvent) {
@@ -67,7 +59,6 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     }
 
     if (event is InitializeChatEvent) {
-      _initializeSpeak();
       _initializeHive();
     }
 
@@ -76,35 +67,6 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       _isSwap = !_isSwap;
       _reset();
     }
-  }
-
-  void _initializeSpeak() {
-    flutterTts = FlutterTts();
-
-    flutterTts.setStartHandler(() {
-      print("playing");
-      ttsState = TtsState.playing;
-    });
-
-    flutterTts.setCompletionHandler(() {
-      print("Complete");
-      ttsState = TtsState.stopped;
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      print("error: $msg");
-      ttsState = TtsState.stopped;
-    });
-  }
-
-  Future _speak(int chatIndex) async {
-    await flutterTts.setVolume(volume);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setPitch(pitch);
-    String textToSpeak = (_chatsToDisplay[chatIndex] as ChatDataModel).text;
-
-    var result = await flutterTts.speak(textToSpeak);
-    if (result == 1) ttsState = TtsState.playing;
   }
 
   void _reset() async {
