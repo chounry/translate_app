@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       ..show(
 
         // Positions the banner ad 60 pixels from the bottom of the screen
-        anchorOffset: 70.0,
+        anchorOffset: 81.0,
         // Banner Position
         anchorType: AnchorType.top,
       );

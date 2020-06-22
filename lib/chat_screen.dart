@@ -174,8 +174,8 @@ class _ChatScreenState extends State<ChatScreen> {
               },
               child: SizedBox.shrink(),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * .1,
+            Container(
+              height: MediaQuery.of(context).size.height * .08,
             ),
             Expanded(
               child: Padding(
