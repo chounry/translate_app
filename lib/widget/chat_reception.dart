@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:translateapp/bloc/chat_item_copy/chat_item_copy_bloc.dart';
+import 'package:translateapp/bloc/chat_item_copy/chat_item_copy_event.dart';
+import 'package:translateapp/bloc/chat_item_copy/chat_item_copy_state.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_bloc.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_event.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_state.dart';
@@ -16,18 +19,27 @@ class ChatReception extends StatefulWidget {
 }
 
 class _ChatReceptionState extends State<ChatReception> {
-  ChatItemPlaySoundBloc _chatItemBloc;
+  ChatItemPlaySoundBloc _chatItemPlaySoundBloc;
+  ChatItemCopyBloc _chatItemCopyBloc;
 
   @override
   void initState() {
-    _chatItemBloc = ChatItemPlaySoundBloc(widget.text);
+    _chatItemPlaySoundBloc = ChatItemPlaySoundBloc(widget.text);
+    _chatItemCopyBloc = ChatItemCopyBloc(widget.text);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ChatItemPlaySoundBloc>(
-      create: (BuildContext context) => _chatItemBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ChatItemPlaySoundBloc>(
+          create: (BuildContext context) => _chatItemPlaySoundBloc,
+        ),
+        BlocProvider<ChatItemCopyBloc>(
+          create: (BuildContext context) => _chatItemCopyBloc,
+        )
+      ],
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10),
         child: Row(
@@ -78,7 +90,7 @@ class _ChatReceptionState extends State<ChatReception> {
                       print("STATE in $state");
                       return GestureDetector(
                         onTap: () {
-                          _chatItemBloc.add(StopEvent());
+                          _chatItemPlaySoundBloc.add(StopEvent());
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -93,7 +105,7 @@ class _ChatReceptionState extends State<ChatReception> {
                     print("ON NO");
                     return GestureDetector(
                       onTap: () {
-                        _chatItemBloc.add(OnPlayClickEvent());
+                        _chatItemPlaySoundBloc.add(OnPlayClickEvent());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -105,6 +117,33 @@ class _ChatReceptionState extends State<ChatReception> {
                       ),
                     );
                   },
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8, left: 3),
+                  child: BlocBuilder<ChatItemCopyBloc, ChatItemCopyState>(
+                    builder: (BuildContext context, ChatItemCopyState state) {
+                      if (state is OnDisplayCopiedTextState) {
+                        return Text(
+                          'copied',
+                          style: TextStyle(
+                              color: Colors.grey.withOpacity(.5),
+                              fontSize:
+                                  MediaQuery.of(context).size.width * .03),
+                        );
+                      }
+
+                      return GestureDetector(
+                        onTap: () {
+                          _chatItemCopyBloc.add(OnCopyClickEvent());
+                        },
+                        child: Icon(
+                          Icons.content_copy,
+                          size: MediaQuery.of(context).size.width * .04,
+                          color: Colors.grey.withOpacity(.5),
+                        ),
+                      );
+                    },
+                  ),
                 )
               ],
             ),

@@ -18,7 +18,7 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
 
 BannerAd myBanner = BannerAd(
   adUnitId: BannerAd.testAdUnitId,
-  size: AdSize.smartBanner,
+  size: AdSize.banner,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
     print("BannerAd event is $event");
