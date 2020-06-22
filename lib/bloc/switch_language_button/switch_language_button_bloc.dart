@@ -4,12 +4,9 @@ import 'package:translateapp/bloc/switch_language_button/switch_language_button_
 
 class SwitchLanguageButtonBloc
     extends Bloc<SwitchLanguageButtonEvent, SwitchLanguageButtonState> {
-  String fromImage = '';
-  String toImage = '';
-  bool _isSwap = false;
-
   @override
-  SwitchLanguageButtonState get initialState => SwitchLanguageButtonState(false);
+  SwitchLanguageButtonState get initialState =>
+      SwitchLanguageButtonState(false);
 
   @override
   Stream<SwitchLanguageButtonState> mapEventToState(
@@ -19,7 +16,6 @@ class SwitchLanguageButtonBloc
     }
 
     if (event is OnEnableSwitchButtonEvent) {
-      String imageToShow = _isSwap ? toImage : fromImage;
       yield SwitchLanguageButtonState(true);
     }
   }
