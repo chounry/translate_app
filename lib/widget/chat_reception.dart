@@ -102,7 +102,6 @@ class _ChatReceptionState extends State<ChatReception> {
                         ),
                       );
                     }
-                    print("ON NO");
                     return GestureDetector(
                       onTap: () {
                         _chatItemPlaySoundBloc.add(OnPlayClickEvent());

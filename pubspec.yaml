@@ -69,6 +69,7 @@ flutter:
     - english_japan.png
     - japan_flag.png
     - chat_item_loading.gif
+    - default_chat_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

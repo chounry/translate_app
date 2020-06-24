@@ -171,6 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
 
                 if (state is OnTranslateFailState) {
+                  _switchLanguageButtonBloc.add(OnEnableSwitchButtonEvent());
                   _chatLoaderBloc.add(OnRemoveChatLoadingEvent());
                   AlertDialog errorDialog = AlertDialog(
                     title: Text(state.errorMessage.title),
@@ -214,7 +215,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (noChatsYet) {
                         return _getEmptyChatWidget();
                       }
-                      print("Chat Screen all chat ${state.chats.length}");
                       return NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification scrollInfo) {
                           bool shouldLoadMore = scrollInfo.metrics.pixels ==
@@ -246,12 +246,21 @@ class _ChatScreenState extends State<ChatScreen> {
                                   child: CircularProgressIndicator(),
                                 );
                               }
-                              print("CURRENT INDEX $index");
                               ChatDataModel chat = state.chats[index];
-                              bool isChatMe = chat.isMe;
+                              bool isChatMe = chat.isMe && !chat.isDefault;
                               if (isChatMe) {
                                 return ChatMe(
                                   text: chat.text,
+                                  image: chat.icon,
+                                );
+                              }
+                              if (chat.isDefault) {
+                                String messageToShow = state.isSwap
+                                    ? chat.translatedLanguageMessage
+                                    : chat.mainLanguageMessage;
+
+                                return ChatReception(
+                                  text: messageToShow,
                                   image: chat.icon,
                                 );
                               }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:translateapp/config/config.dart';
 import 'package:translateapp/model/abs_chat_model.dart';
 
 part 'chat_data_model.g.dart';
@@ -8,6 +9,7 @@ part 'chat_data_model.g.dart';
 class ChatDataModel implements AbsChatModel {
   static const String CHAT_ME_ICON = 'assets/england_flag.jpg';
   static const String CHAT_RECEPTION_ICON = 'assets/japan_flag.png';
+  static const String CHAT_DEFAULT_ICON = 'assets/default_chat_icon.png';
 
   @HiveField(0)
   final String text;
@@ -17,9 +19,18 @@ class ChatDataModel implements AbsChatModel {
   bool isMe;
   @HiveField(2)
   final String icon;
+  @HiveField(3)
+  final bool isDefault;
 
   ChatDataModel(
-      {@required this.text, @required this.isMe, @required this.icon});
+      {this.text = '',
+      @required this.isMe,
+      @required this.icon,
+      this.isDefault = false});
+
+  String get mainLanguageMessage => Config.INITIAL_TEXT_ME;
+
+  String get translatedLanguageMessage => Config.INITIAL_TEXT_RECEPTION;
 
 //  static List<ChatModel> getChats(int total) {
 //    bool isMe = true;

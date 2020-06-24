@@ -21,7 +21,7 @@ BannerAd myBanner = BannerAd(
   size: AdSize.banner,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
-    print("BannerAd event is $event");
+//    print("BannerAd event is $event");
   },
 );
 
@@ -29,7 +29,7 @@ InterstitialAd myInterstitial = InterstitialAd(
   adUnitId: InterstitialAd.testAdUnitId,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
-    print("InterstitialAd event is $event");
+//    print("InterstitialAd event is $event");
   },
 );
 

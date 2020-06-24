@@ -20,18 +20,21 @@ class ChatDataModelAdapter extends TypeAdapter<ChatDataModel> {
       text: fields[0] as String,
       isMe: fields[1] as bool,
       icon: fields[2] as String,
+      isDefault: fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, ChatDataModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.text)
       ..writeByte(1)
       ..write(obj.isMe)
       ..writeByte(2)
-      ..write(obj.icon);
+      ..write(obj.icon)
+      ..writeByte(3)
+      ..write(obj.isDefault);
   }
 }

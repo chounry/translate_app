@@ -98,9 +98,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
     Box box = await Hive.openBox('translate_app');
     List<ChatDataModel> chatsToSave = [];
     ChatDataModel initialChat = ChatDataModel(
-        text: Config.INITIAL_TEXT,
-        isMe: false,
-        icon: ChatDataModel.CHAT_RECEPTION_ICON);
+        isMe: false, icon: ChatDataModel.CHAT_DEFAULT_ICON, isDefault: true);
     chatsToSave.add(initialChat);
     await box.put('chat', chatsToSave);
     _chatFromLocal = chatsToSave;
@@ -126,7 +124,7 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
         }
         if (_isSwap) {
           chats = chats.map((chat) {
-            chat.isMe = !chat.isMe;
+            chat.isMe = chat.isDefault ? chat.isMe : !chat.isMe;
             return chat;
           }).toList();
           chats = _switchChat(chats);
@@ -140,16 +138,20 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
 
   List<ChatDataModel> _switchChat(List<ChatDataModel> chats) {
     List<ChatDataModel> switchedChats = [];
-
     for (int i = 0; i < chats.length; i += 2) {
       ChatDataModel firstChat = chats[i];
-
+      bool isSecondChatIsDefault = false;
       if (chats.length > i + 1) {
         ChatDataModel secondChat = chats[i + 1];
         switchedChats.insert(switchedChats.length, secondChat);
+        isSecondChatIsDefault = secondChat.isDefault;
       }
 
-      switchedChats.insert(switchedChats.length, firstChat);
+      if (isSecondChatIsDefault) {
+        switchedChats.insert(switchedChats.length - 1, firstChat);
+      } else {
+        switchedChats.insert(switchedChats.length, firstChat);
+      }
     }
 
     return switchedChats;
