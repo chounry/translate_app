@@ -10,8 +10,9 @@ import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_stat
 class ChatReception extends StatefulWidget {
   final String text;
   final String image;
+  final bool isDefaultChat;
 
-  const ChatReception({Key key, @required this.text, @required this.image})
+  const ChatReception({Key key, @required this.text, @required this.image, this.isDefaultChat = false})
       : super(key: key);
 
   @override
@@ -46,12 +47,26 @@ class _ChatReceptionState extends State<ChatReception> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              width: MediaQuery.of(context).size.width * 0.07,
-              height: MediaQuery.of(context).size.width * 0.07,
-              child: CircleAvatar(
-                backgroundImage: AssetImage(widget.image),
-              ),
+            Builder(builder: (BuildContext context) {
+              if(widget.isDefaultChat){
+                return  Container(
+                  width: MediaQuery.of(context).size.width * 0.1,
+                  height: MediaQuery.of(context).size.width * 0.1,
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(widget.image),
+                  ),
+                );
+              }
+
+              return  Container(
+                width: MediaQuery.of(context).size.width * 0.07,
+                height: MediaQuery.of(context).size.width * 0.07,
+                child: CircleAvatar(
+                  backgroundImage: AssetImage(widget.image),
+                ),
+              );
+            },
+
             ),
             SizedBox(
               width: 5,
@@ -102,6 +117,7 @@ class _ChatReceptionState extends State<ChatReception> {
                         ),
                       );
                     }
+                    print("STATE in here $state");
                     return GestureDetector(
                       onTap: () {
                         _chatItemPlaySoundBloc.add(OnPlayClickEvent());

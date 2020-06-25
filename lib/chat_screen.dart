@@ -261,6 +261,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                                 return ChatReception(
                                   text: messageToShow,
+                                  isDefaultChat: true,
                                   image: chat.icon,
                                 );
                               }
