@@ -12,7 +12,11 @@ class ChatReception extends StatefulWidget {
   final String image;
   final bool isDefaultChat;
 
-  const ChatReception({Key key, @required this.text, @required this.image, this.isDefaultChat = false})
+  const ChatReception(
+      {Key key,
+      @required this.text,
+      @required this.image,
+      this.isDefaultChat = false})
       : super(key: key);
 
   @override
@@ -47,26 +51,26 @@ class _ChatReceptionState extends State<ChatReception> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Builder(builder: (BuildContext context) {
-              if(widget.isDefaultChat){
-                return  Container(
-                  width: MediaQuery.of(context).size.width * 0.1,
-                  height: MediaQuery.of(context).size.width * 0.1,
+            Builder(
+              builder: (BuildContext context) {
+                if (widget.isDefaultChat) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width * 0.1,
+                    height: MediaQuery.of(context).size.width * 0.1,
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage(widget.image),
+                    ),
+                  );
+                }
+
+                return Container(
+                  width: MediaQuery.of(context).size.width * 0.07,
+                  height: MediaQuery.of(context).size.width * 0.07,
                   child: CircleAvatar(
                     backgroundImage: AssetImage(widget.image),
                   ),
                 );
-              }
-
-              return  Container(
-                width: MediaQuery.of(context).size.width * 0.07,
-                height: MediaQuery.of(context).size.width * 0.07,
-                child: CircleAvatar(
-                  backgroundImage: AssetImage(widget.image),
-                ),
-              );
-            },
-
+              },
             ),
             SizedBox(
               width: 5,
