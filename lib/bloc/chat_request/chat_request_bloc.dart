@@ -109,7 +109,7 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
     bool isSaveGotToMaximum = chatFromLocal.length / 2 >= Config.CHAT_MAXIMUM;
     if (isSaveGotToMaximum) {
       // todo : NOTE,  it will not delete from display immediately. I need a restarting app
-      chatFromLocal.removeAt(chatFromLocal.length - 2);
+      chatFromLocal.removeAt(chatFromLocal.length - 2); // remove a pair of chat
       chatFromLocal.removeAt(chatFromLocal.length - 2);
     }
     bool needChangeSaveIndex = _isSwap && chatToSave.isMe;
