@@ -11,6 +11,8 @@ class OnChatLoadedEvent extends ChatLoaderEvent {
 
 class OnLoadMoreEvent extends ChatLoaderEvent {}
 
+class RemoveOneLatestChatEvent extends ChatLoaderEvent {}
+
 class LoadAllLocalEvent extends ChatLoaderEvent {}
 
 class OnSwapLanguageEvent extends ChatLoaderEvent {}

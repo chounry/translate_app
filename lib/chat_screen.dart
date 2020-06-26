@@ -173,6 +173,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (state is OnTranslateFailState) {
                   _switchLanguageButtonBloc.add(OnEnableSwitchButtonEvent());
                   _chatLoaderBloc.add(OnRemoveChatLoadingEvent());
+                  _chatLoaderBloc.add(RemoveOneLatestChatEvent());
                   AlertDialog errorDialog = AlertDialog(
                     title: Text(state.errorMessage.title),
                     content: Text(state.errorMessage.description),

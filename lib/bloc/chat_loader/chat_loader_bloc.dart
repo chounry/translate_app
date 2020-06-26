@@ -67,6 +67,11 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       _isSwap = !_isSwap;
       _reset();
     }
+
+    if (event is RemoveOneLatestChatEvent) {
+      _removeLatestOneFromDisplay();
+      add(OnChatLoadedEvent(true));
+    }
   }
 
   void _reset() async {
@@ -92,6 +97,10 @@ class ChatLoaderBloc extends Bloc<ChatLoaderEvent, ChatLoaderState> {
       await Hive.close();
     }
     _loadChats();
+  }
+
+  void _removeLatestOneFromDisplay() {
+    _chatsToDisplay.removeAt(0);
   }
 
   Future<void> _createInitialChats() async {

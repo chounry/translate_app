@@ -37,6 +37,7 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
     }
 
     if (event is OnTranslateFailEvent) {
+      _removeOneLastChat();
       yield OnTranslateFailState(event.errorMessage);
     }
   }
@@ -111,6 +112,20 @@ class ChatRequestBloc extends Bloc<ChatRequestEvent, ChatRequestState> {
       chatFromLocal.insert(0, chatToSave);
     }
     await box.put('chat', chatFromLocal);
+
+    if (Hive.isBoxOpen('translate_app')) {
+      await Hive.close();
+    }
+  }
+
+  void _removeOneLastChat() async {
+    Box box = await Hive.openBox('translate_app');
+
+    List<ChatDataModel> chatFromLocal =
+        (box.get('chat') as List)?.cast<ChatDataModel>();
+    chatFromLocal = chatFromLocal ?? [];
+    chatFromLocal.removeAt(0);
+    box.put("chat", chatFromLocal);
 
     if (Hive.isBoxOpen('translate_app')) {
       await Hive.close();
