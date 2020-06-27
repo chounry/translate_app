@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_bloc.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_bloc.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_event.dart';
 import 'package:translateapp/bloc/chat_loader/chat_loader_state.dart';
@@ -17,6 +18,7 @@ import 'package:translateapp/widget/chat_me.dart';
 import 'package:translateapp/widget/chat_reception.dart';
 
 import 'bloc/chat_request/chat_request_state.dart';
+import 'bloc/chat_speak_managment/chat_speak_management_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -29,6 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
   ChatRequestBloc _chatRequestBloc = ChatRequestBloc();
   SwitchLanguageButtonBloc _switchLanguageButtonBloc =
       SwitchLanguageButtonBloc();
+  ChatSpeakManagementBloc _chatSpeakManagementBloc = ChatSpeakManagementBloc();
 
   TextEditingController _messageEditingTextCtrl = TextEditingController();
 
@@ -145,6 +148,9 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         BlocProvider<SwitchLanguageButtonBloc>(
           create: (BuildContext context) => _switchLanguageButtonBloc,
+        ),
+        BlocProvider<ChatSpeakManagementBloc>(
+          create: (BuildContext context) => _chatSpeakManagementBloc,
         )
       ],
       child: Scaffold(
@@ -255,19 +261,33 @@ class _ChatScreenState extends State<ChatScreen> {
                                   image: chat.icon,
                                 );
                               }
+                              bool chatSoundManagementNeedClearList =
+                                  index == 0;
+
+                              if (chatSoundManagementNeedClearList) {
+                                _chatSpeakManagementBloc
+                                    .clearChatItemSoundBlocList();
+                              }
+                              String messageToShow = chat.text;
+
                               if (chat.isDefault) {
-                                String messageToShow = state.isSwap
+                                messageToShow = state.isSwap
                                     ? chat.translatedLanguageMessage
                                     : chat.mainLanguageMessage;
-
-                                return ChatReception(
-                                  text: messageToShow,
-                                  isDefaultChat: true,
-                                  image: chat.icon,
-                                );
                               }
+
+                              ChatItemPlaySoundBloc chatItemPlatSoundBloc =
+                                  ChatItemPlaySoundBloc(messageToShow);
+
+                              _chatSpeakManagementBloc
+                                  .addChatSoundBloc(chatItemPlatSoundBloc);
                               return ChatReception(
-                                text: chat.text,
+                                _chatSpeakManagementBloc.getLastIndex,
+                                chatItemPlaySoundBloc: chatItemPlatSoundBloc,
+                                chatSpeakManagementBloc:
+                                    _chatSpeakManagementBloc,
+                                isDefaultChat: chat.isDefault,
+                                text: messageToShow,
                                 image: chat.icon,
                               );
                             }),

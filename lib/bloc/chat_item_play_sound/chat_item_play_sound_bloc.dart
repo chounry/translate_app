@@ -44,7 +44,7 @@ class ChatItemPlaySoundBloc
     }
   }
 
-  void _onSpeakCompleteHandler() {
+  void stopSpeaking() {
     _ttsState = TtsState.stopped;
     add(StopEvent());
   }
@@ -58,12 +58,12 @@ class ChatItemPlaySoundBloc
     });
 
     flutterTts.setCompletionHandler(() {
-      _onSpeakCompleteHandler();
+      stopSpeaking();
     });
 
     flutterTts.setErrorHandler((msg) {
       print("error: $msg");
-      _onSpeakCompleteHandler();
+      stopSpeaking();
     });
   }
 

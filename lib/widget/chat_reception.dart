@@ -6,17 +6,24 @@ import 'package:translateapp/bloc/chat_item_copy/chat_item_copy_state.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_bloc.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_event.dart';
 import 'package:translateapp/bloc/chat_item_play_sound/chat_item_play_sound_state.dart';
+import 'package:translateapp/bloc/chat_speak_managment/chat_speak_management_bloc.dart';
+import 'package:translateapp/bloc/chat_speak_managment/chat_speak_management_event.dart';
 
 class ChatReception extends StatefulWidget {
   final String text;
   final String image;
   final bool isDefaultChat;
+  final ChatItemPlaySoundBloc chatItemPlaySoundBloc;
+  final int index;
+  final ChatSpeakManagementBloc chatSpeakManagementBloc;
 
-  const ChatReception(
+  const ChatReception(this.index,
       {Key key,
-      @required this.text,
-      @required this.image,
-      this.isDefaultChat = false})
+        @required this.text,
+        @required this.image,
+        @required this.chatItemPlaySoundBloc,
+        @required this.chatSpeakManagementBloc,
+        this.isDefaultChat = false})
       : super(key: key);
 
   @override
@@ -24,12 +31,12 @@ class ChatReception extends StatefulWidget {
 }
 
 class _ChatReceptionState extends State<ChatReception> {
-  ChatItemPlaySoundBloc _chatItemPlaySoundBloc;
+//  ChatItemPlaySoundBloc _chatItemPlaySoundBloc;
   ChatItemCopyBloc _chatItemCopyBloc;
 
   @override
   void initState() {
-    _chatItemPlaySoundBloc = ChatItemPlaySoundBloc(widget.text);
+//    _chatItemPlaySoundBloc = ChatItemPlaySoundBloc(widget.text);
     _chatItemCopyBloc = ChatItemCopyBloc(widget.text);
     super.initState();
   }
@@ -39,11 +46,14 @@ class _ChatReceptionState extends State<ChatReception> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ChatItemPlaySoundBloc>(
-          create: (BuildContext context) => _chatItemPlaySoundBloc,
+          create: (BuildContext context) => widget.chatItemPlaySoundBloc,
         ),
         BlocProvider<ChatItemCopyBloc>(
           create: (BuildContext context) => _chatItemCopyBloc,
-        )
+        ),
+        BlocProvider<ChatSpeakManagementBloc>(
+          create: (BuildContext context) => widget.chatSpeakManagementBloc,
+        ),
       ],
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10),
@@ -55,8 +65,14 @@ class _ChatReceptionState extends State<ChatReception> {
               builder: (BuildContext context) {
                 if (widget.isDefaultChat) {
                   return Container(
-                    width: MediaQuery.of(context).size.width * 0.1,
-                    height: MediaQuery.of(context).size.width * 0.1,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.1,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.1,
                     child: CircleAvatar(
                       backgroundImage: AssetImage(widget.image),
                     ),
@@ -64,8 +80,14 @@ class _ChatReceptionState extends State<ChatReception> {
                 }
 
                 return Container(
-                  width: MediaQuery.of(context).size.width * 0.07,
-                  height: MediaQuery.of(context).size.width * 0.07,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.07,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.07,
                   child: CircleAvatar(
                     backgroundImage: AssetImage(widget.image),
                   ),
@@ -80,7 +102,10 @@ class _ChatReceptionState extends State<ChatReception> {
               children: [
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.65,
+                    maxWidth: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.65,
                   ),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -109,13 +134,18 @@ class _ChatReceptionState extends State<ChatReception> {
                       print("STATE in $state");
                       return GestureDetector(
                         onTap: () {
-                          _chatItemPlaySoundBloc.add(StopEvent());
+                          widget.chatSpeakManagementBloc.add(
+                              OnIAmSpeakingEvent(widget.index));
+                          widget.chatItemPlaySoundBloc.add(StopEvent());
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Icon(
                             Icons.pause,
-                            size: MediaQuery.of(context).size.width * .04,
+                            size: MediaQuery
+                                .of(context)
+                                .size
+                                .width * .04,
                             color: Colors.grey.withOpacity(.5),
                           ),
                         ),
@@ -124,13 +154,16 @@ class _ChatReceptionState extends State<ChatReception> {
                     print("STATE in here $state");
                     return GestureDetector(
                       onTap: () {
-                        _chatItemPlaySoundBloc.add(OnPlayClickEvent());
+                        widget.chatItemPlaySoundBloc.add(OnPlayClickEvent());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Icon(
                           Icons.volume_up,
-                          size: MediaQuery.of(context).size.width * .04,
+                          size: MediaQuery
+                              .of(context)
+                              .size
+                              .width * .04,
                           color: Colors.grey.withOpacity(.5),
                         ),
                       ),
@@ -147,7 +180,10 @@ class _ChatReceptionState extends State<ChatReception> {
                           style: TextStyle(
                               color: Colors.grey.withOpacity(.5),
                               fontSize:
-                                  MediaQuery.of(context).size.width * .03),
+                              MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * .03),
                         );
                       }
 
@@ -157,7 +193,10 @@ class _ChatReceptionState extends State<ChatReception> {
                         },
                         child: Icon(
                           Icons.content_copy,
-                          size: MediaQuery.of(context).size.width * .04,
+                          size: MediaQuery
+                              .of(context)
+                              .size
+                              .width * .04,
                           color: Colors.grey.withOpacity(.5),
                         ),
                       );

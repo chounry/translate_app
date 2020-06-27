@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:translateapp/model/abs_chat_model.dart';
-import 'package:translateapp/model/chat_data_model.dart';
 
 class ChatLoaderState {}
 
