@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       ..show(
 
         // Positions the banner ad 60 pixels from the bottom of the screen
-        anchorOffset: 81.0,
+        anchorOffset: kToolbarHeight + 25,
         // Banner Position
         anchorType: AnchorType.top,
       );
